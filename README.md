@@ -5,7 +5,7 @@ The game was written by me back in 2009 when I was studying in University.</br>
 
 **There are two main parts:** </br>
 _Level Editor_ that looks like this:
-<img src="https://raw.githubusercontent.com/art1988/Pacman/master/LevelEditor.png?token=GHSAT0AAAAAABULS5HRKPPYGE7CJBWNP3EIY4XI3LA"/>
+(https://raw.githubusercontent.com/art1988/Pacman/master/img/LevelEditor.png)
 </br>and</br>
 _Pacman game_ itself:
 
