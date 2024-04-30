@@ -1,10 +1,10 @@
-import javax.swing.ImageIcon;
+import java.awt.*;
 
 public class Inky extends Ghost {
 	public Inky(int xFocus, int yFocus) {
 		super(xFocus, yFocus);
 
-		setImage(new ImageIcon(System.getProperty("user.dir") + "/src/main/resources/inkGhost.png"));
+		setImage(new SerializableImage(Toolkit.getDefaultToolkit().getImage(System.getProperty("user.dir") + "/src/main/resources/inkGhost.png")));
 		setStrategy(new BlinkyStrategy());
 		setName("Inky");
 	}

@@ -1,7 +1,5 @@
-import javax.swing.ImageIcon;
-
 public abstract class Ghost extends Creature {
-	private ImageIcon img;
+	private SerializableImage img;
 	private Strategy strategy;
 	private String name;
 	
@@ -9,11 +7,11 @@ public abstract class Ghost extends Creature {
 		super(xFocus, yFocus);
 	}
 	
-	public ImageIcon getImage() {
+	public SerializableImage getImage() {
 		return img;
 	}
 	
-	public void setImage(ImageIcon img) {
+	public void setImage(SerializableImage img) {
 		this.img = img;
 	}
 	

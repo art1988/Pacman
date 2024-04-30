@@ -461,8 +461,8 @@ public class LevelEditor implements Const {
 			if(creature[i] instanceof Pinky)  pinkGhost.setEnabled(false);
 			if(creature[i] instanceof Inky)   inkGhost.setEnabled(false);
 			if(creature[i] instanceof Clyde)  orangeGhost.setEnabled(false);
-			
-			imgGr.drawImage( ((Ghost)(creature[i])).getImage().getImage(), 
+
+			imgGr.drawImage( ((Ghost)(creature[i])).getImage().getImage(),
 									  (creature[i].getXCorner() * 4 + 5) + CELL_SIZE + 1, creature[i].getYCorner() * 4 + CELL_SIZE + 1,
 									  2 * CELL_SIZE - 1, 2 * CELL_SIZE - 1,
 									  null);
@@ -669,7 +669,7 @@ public class LevelEditor implements Const {
 						
 						creature[i].setDirection(Direction.NONE);
 						
-						imgGr.drawImage( ((Ghost)(creature[i])).getImage().getImage(), 
+						imgGr.drawImage( ((Ghost)(creature[i])).getImage().getImage(),
 								         (int) (x * x_dx) - CELL_SIZE + 1,
 								         (int) (y * y_dy) - CELL_SIZE + 1,
 								         2 * CELL_SIZE - 1, 2 * CELL_SIZE - 1,
@@ -700,7 +700,7 @@ public class LevelEditor implements Const {
 						//TODO:
 						creature[i].setDirection(Direction.NONE);
 						
-						imgGr.drawImage( ((Ghost)(creature[i])).getImage().getImage(), 
+						imgGr.drawImage( ((Ghost)(creature[i])).getImage().getImage(),
 								         (int) (x * x_dx + 5) - CELL_SIZE + 1, // +5 - small displacement for correct representation
 								         (int) (y * y_dy) - CELL_SIZE + 1,
 								         2 * CELL_SIZE - 1, 2 * CELL_SIZE - 1,
@@ -731,7 +731,7 @@ public class LevelEditor implements Const {
 						//TODO:
 						creature[i].setDirection(Direction.NONE);
 						
-						imgGr.drawImage( ((Ghost)(creature[i])).getImage().getImage(), 
+						imgGr.drawImage( ((Ghost)(creature[i])).getImage().getImage(),
 								         (int) (x * x_dx + 5) - CELL_SIZE + 1, // +5 - small displacement for correct representation
 								         (int) (y * y_dy) - CELL_SIZE + 1,
 								         2 * CELL_SIZE - 1, 2 * CELL_SIZE - 1,
@@ -762,7 +762,7 @@ public class LevelEditor implements Const {
 						//TODO:
 						creature[i].setDirection(Direction.NONE);
 						
-						imgGr.drawImage( ((Ghost)(creature[i])).getImage().getImage(), 
+						imgGr.drawImage( ((Ghost)(creature[i])).getImage().getImage(),
 								         (int) (x * x_dx + 5) - CELL_SIZE + 1, // +5 - small displacement for correct representation
 								         (int) (y * y_dy) - CELL_SIZE + 1,
 								         2 * CELL_SIZE - 1, 2 * CELL_SIZE - 1,

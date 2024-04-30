@@ -106,7 +106,7 @@ public class PacmanGame implements Const
 		window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
 		setLocation();
-		
+
 		window.getContentPane().add(initContent());
 		window.setVisible(true);
 	}
@@ -171,10 +171,9 @@ public class PacmanGame implements Const
 		public void paint(Graphics g) {
 			// Drawing background on picture 
 			imgPicture.drawImage(background, 0, 0, null);
-			
-			// TODO: Delete this line after append all ghosts
+
 			if(creature == null) return;
-			
+
 			// Drawing creatures
 			for(int i = 0; i < creature.length; i++) 
 				drawCreature(creature[i]);
@@ -469,7 +468,7 @@ public class PacmanGame implements Const
 		
 		if(creature instanceof Ghost) {
 			if(creature instanceof Blinky) {
-				imgPicture.drawImage( ((Ghost)(creature)).getImage().getImage(), 
+				imgPicture.drawImage( ((Ghost)(creature)).getImage().getImage(),
 						                       creature.getXCorner() * 2 + CELL_SIZE,
 						   					   creature.getYCorner() * 2 + CELL_SIZE, 
 						   					   2 * CELL_SIZE, 
@@ -738,9 +737,6 @@ public class PacmanGame implements Const
 	
 	// TODO: Complete
 	private void removePacmanLife(Ghost ghost) {
-		countOfPacmanLife--;
-		lifeIndicator.repaint();
-
 		// Kill motion tasks
 		pacmanMotionTask.cancel();
 		pacmanTimer.purge();
@@ -757,13 +753,17 @@ public class PacmanGame implements Const
 		clydeMotionTask.cancel();
 		clydeTimer.purge();
 
+		countOfPacmanLife--;
+		lifeIndicator.repaint();
+
 		if(!ghostLauncher.isInterrupted()) ghostLauncher.interrupt();
 
 		String message = "You have been eaten by " + ghost.getName() + " !"+ "\nPrepare for new round !";
 		JOptionPane.showMessageDialog(window, message, "Oops !", JOptionPane.INFORMATION_MESSAGE);
 
 		// TODO: Restore for new game. Button 'Start'
-		if(checkLose()) {
+		if( checkLose() )
+		{
 			//
 			//
 			//
@@ -829,13 +829,13 @@ public class PacmanGame implements Const
 		// From above
 		if(ghost.getXFocus() == pacman.getXFocus() && ghost.getYFocus() >= pacman.getYCorner() && ghost.getYFocus() <= pacman.getYFocus())
 			caught = true;
-		// From left
+		// From the left
 		if(ghost.getYFocus() == pacman.getYFocus() && ghost.getXFocus() >= pacman.getXCorner() && ghost.getXFocus() <= pacman.getXFocus())
 			caught = true;
-		// From down
+		// From below
 		if(ghost.getXFocus() == pacman.getXFocus() && ghost.getYFocus() >= pacman.getYFocus() && ghost.getYFocus() <= pacman.getYCorner() + CELL_SIZE)
 			caught = true;
-		// From right
+		// From the right
 		if(ghost.getYFocus() == pacman.getYFocus() && ghost.getXFocus() >= pacman.getXFocus() && ghost.getXFocus() <= pacman.getXCorner() + CELL_SIZE)
 			caught = true;
 		
@@ -976,7 +976,6 @@ public class PacmanGame implements Const
 					inkyMotionTask.cancel();
 					inkyTimer.purge();
 
-					inkyTimer = new Timer();
 					inkyTimer.schedule(inkyMotionTask = new InkyMotion(), 0, SPEED_OF_PACMAN);
 				}
 				
@@ -986,7 +985,6 @@ public class PacmanGame implements Const
 					clydeMotionTask.cancel();
 					clydeTimer.purge();
 
-					clydeTimer = new Timer();
 					clydeTimer.schedule(clydeMotionTask = new ClydeMotion(), 0, SPEED_OF_PACMAN);
 
 					break; // Thread stops
