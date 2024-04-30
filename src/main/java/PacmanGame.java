@@ -13,7 +13,8 @@ import java.io.ObjectInputStream;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class PacmanGame implements Const {
+public class PacmanGame implements Const
+{
 	private static JFrame window;
 	private static JButton start, load, editor, exit;
 	
@@ -64,8 +65,9 @@ public class PacmanGame implements Const {
 							 pinkyMotionTask,
 							 inkyMotionTask,
 							 clydeMotionTask;
-	
-	
+
+	private static boolean caught = false; // Was Pacman caught ?
+
 	private static GhostLauncher ghostLauncher;
 	
 	
@@ -89,7 +91,7 @@ public class PacmanGame implements Const {
 	private static int xPortal1, yPortal1,
 					   xPortal2, yPortal2;
 	
-	
+
 	public static void main(String[] args) {
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
@@ -224,11 +226,14 @@ public class PacmanGame implements Const {
 	
 	
 	public void loadLevel(File from) {
-		try {
-			ObjectInputStream ois = new ObjectInputStream(new BufferedInputStream(new FileInputStream(from)));
+
+		try (ObjectInputStream ois = new ObjectInputStream(new BufferedInputStream(new FileInputStream(from))))
+		{
 			level = (Level) ois.readObject();
-			ois.close();
-		} catch (Exception e) {
+        }
+		catch (Exception e)
+		{
+			System.err.println("Unable to load level !");
 			e.printStackTrace();
 		}
 	}
@@ -368,14 +373,11 @@ public class PacmanGame implements Const {
 	
 
 	public void startGame() {
-		ghostLauncher = new GhostLauncher();
-		ghostLauncher.start();
-		
 		pacmanMotion = true;
 		
 		pacmanTimer.schedule(pacmanMotionTask = new PacmanMotion(), 0, SPEED_OF_PACMAN);
 
-		pinky.setDirection(Direction.DOWN); // TODO: Add it in Editor
+		pinky.setDirection(Direction.UP); // TODO: Add it in Editor
 		pinkyTimer.schedule(pinkyMotionTask = new HomeMotion(pinky), 0, SPEED_OF_PACMAN);
 		
 		inky.setDirection(Direction.DOWN);
@@ -383,19 +385,22 @@ public class PacmanGame implements Const {
 		
 		clyde.setDirection(Direction.DOWN);
 		clydeTimer.schedule(clydeMotionTask = new HomeMotion(clyde), 0, SPEED_OF_PACMAN);
+
+		ghostLauncher = new GhostLauncher();
+		ghostLauncher.start();
 	}
 	
 	
 	public void preparePictureForCreature(Creature creature) {
-		if(creature.getDirection() == null) return; // For correct work with Strategy
-		
+		if(creature.getDirection() == null) return; // For correct work with Strategy. Direction may be null if creature pass through portal
+
 		moveCreature(creature);
-		
+
 		updateCornerCoords(creature);
 		
 		if(creature instanceof Pacman) {
 			checkAccessOfNextDirection();
-			pacmanEating();
+			pacmanEatingAnimation();
 		}
 		
 		checkNextStep(creature);
@@ -444,7 +449,7 @@ public class PacmanGame implements Const {
 	}
 	
 	
-	// Draw creature using by xCorner and yCorner coordinates
+	// Draw creature by using xCorner and yCorner coordinates
 	public void drawCreature(Creature creature) {
 		if(creature instanceof Pacman) {
 			setMouthImage();
@@ -569,20 +574,18 @@ public class PacmanGame implements Const {
 			case DOWN:  y = (creature.getYFocus() + CELL_SIZE / 2)       / 5; break;
 		}
 		
-		// TODO: creature.setYFocus(yPortal2 * 5);   -   (???)
-		// Think about y coordinate
-		
 		// It's portal cell
 		if(mapOfRoute[y][x].getType() == 3) {
 			if(x == xPortal1) creature.setXFocus(xPortal2 * 5);
 			if(x == xPortal2) creature.setXFocus(xPortal1 * 5);
 		}
-		
+
+		// Handling walls
 		if(mapOfRoute[y][x].getAccess() == false) {
 			if(creature instanceof Pacman) {
 				pacmanMotion = false;
-				//pacmanTimer.cancel();
 				pacmanMotionTask.cancel();
+				pacmanTimer.purge();
 			}
 		}
 		
@@ -593,11 +596,11 @@ public class PacmanGame implements Const {
 			case UP:    y += 1; break;
 			case DOWN:  y -= 1; break;
 		}
-		
+
 		// Set new direction from Strategy
 		if(creature instanceof Ghost) {
 			Direction dir = (((Ghost) creature).getStrategy()).pointsOfTurn.get(new Point(x, y));
-			
+
 			if(dir != null) {
 				creature.setDirection(dir);
 				(((Ghost) creature).getStrategy()).pointsOfTurn.remove(new Point(x, y));
@@ -659,11 +662,11 @@ public class PacmanGame implements Const {
 	}
 	
 	
-	public void pacmanEating() {
+	public void pacmanEatingAnimation() {
 		int x = pacman.getXFocus() / 5,
 	    	y = pacman.getYFocus() / 5;
 		
-		// Skip eating this cell when pacman passing through portal cell (for correct picture)
+		// Skip eating this cell when pacman passing through portal cell (for correct image representation)
 		if(mapOfRoute[y][x].getType() == 3) return;
 		
 		if(pacman.getXFocus() % 5 == 0 || pacman.getYFocus() % 5 == 0) {
@@ -692,7 +695,6 @@ public class PacmanGame implements Const {
 			
 			if(e.getSource() == load)
 			{
-				// TODO: (!)
 				JFileChooser loadMap = new JFileChooser();
 
 				if(loadMap.showOpenDialog(window) == JFileChooser.APPROVE_OPTION)
@@ -726,7 +728,7 @@ public class PacmanGame implements Const {
 			pacman.setDirection(newDirection);
 			
 			currentDirection = pacman.getDirection();
-			
+
 			if(pacmanMotion == false) {
 				pacmanTimer.schedule(pacmanMotionTask = new PacmanMotion(), 0, SPEED_OF_PACMAN);
 				pacmanMotion = true;
@@ -740,12 +742,25 @@ public class PacmanGame implements Const {
 		lifeIndicator.repaint();
 
 		// Kill motion tasks
-		blinkyTimer.cancel(); blinkyTimer.purge();
-		pinkyTimer.cancel(); pinkyTimer.purge();
-		inkyTimer.cancel(); inkyTimer.purge();
-		clydeTimer.cancel(); clydeTimer.purge();
+		pacmanMotionTask.cancel();
+		pacmanTimer.purge();
 
-		ghostLauncher.stop();
+		blinkyMotionTask.cancel();
+		blinkyTimer.purge();
+
+		pinkyMotionTask.cancel();
+		pinkyTimer.purge();
+
+		inkyMotionTask.cancel();
+		inkyTimer.purge();
+
+		clydeMotionTask.cancel();
+		clydeTimer.purge();
+
+		if(!ghostLauncher.isInterrupted()) ghostLauncher.interrupt();
+
+		String message = "You have been eaten by " + ghost.getName() + " !"+ "\nPrepare for new round !";
+		JOptionPane.showMessageDialog(window, message, "Oops !", JOptionPane.INFORMATION_MESSAGE);
 
 		// TODO: Restore for new game. Button 'Start'
 		if(checkLose()) {
@@ -755,8 +770,7 @@ public class PacmanGame implements Const {
 			return;
 		}
 
-
-		// Restoring to start state for new round
+		// Restoring state for new round
 		pacman.setXFocus(pacmanStartFocus.x);
 		pacman.setYFocus(pacmanStartFocus.y);
 		pacman.setXCorner(pacmanStartCorner.x);
@@ -768,19 +782,16 @@ public class PacmanGame implements Const {
 		blinky.setXCorner(blinkyStartCorner.x);
 		blinky.setYCorner(blinkyStartCorner.y);
 		blinky.getStrategy().clearVariables();
-		blinky.getStrategy().execution = false;
 		blinky.setDirection(Direction.NONE);
-		blinkyTimer = new Timer();
+		// blinky will start in GhostLauncher just after the start of thread
 
 		pinky.setXFocus(pinkyStartFocus.x);
 		pinky.setYFocus(pinkyStartFocus.y);
 		pinky.setXCorner(pinkyStartCorner.x);
 		pinky.setYCorner(pinkyStartCorner.y);
 		pinky.getStrategy().clearVariables();
-		pinky.getStrategy().execution = false;
 		pinkyAtHome = true;
-		pinky.setDirection(Direction.DOWN);
-		pinkyTimer = new Timer();
+		pinky.setDirection(Direction.UP);
 		pinkyTimer.schedule(pinkyMotionTask = new HomeMotion(pinky), 0, SPEED_OF_PACMAN);
 
 		inky.setXFocus(inkyStartFocus.x);
@@ -788,10 +799,8 @@ public class PacmanGame implements Const {
 		inky.setXCorner(inkyStartCorner.x);
 		inky.setYCorner(inkyStartCorner.y);
 		inky.getStrategy().clearVariables();
-		inky.getStrategy().execution = false;
 		inkyAtHome = true;
 		inky.setDirection(Direction.DOWN);
-		inkyTimer = new Timer();
 		inkyTimer.schedule(inkyMotionTask = new HomeMotion(inky), 0, SPEED_OF_PACMAN);
 
 		clyde.setXFocus(clydeStartFocus.x);
@@ -799,26 +808,21 @@ public class PacmanGame implements Const {
 		clyde.setXCorner(clydeStartCorner.x);
 		clyde.setYCorner(clydeStartCorner.y);
 		clyde.getStrategy().clearVariables();
-		clyde.getStrategy().execution = false;
 		clydeAtHome = true;
 		clyde.setDirection(Direction.DOWN);
-		clydeTimer = new Timer();
 		clydeTimer.schedule(clydeMotionTask = new HomeMotion(clyde), 0, SPEED_OF_PACMAN);
 
 		canvasPanel.repaint();
 
-		String message = "You have been eaten by " + ghost.getName() + " !"+ "\nPrepare for new round !";
-		JOptionPane.showMessageDialog(window, message, "Oops !", JOptionPane.INFORMATION_MESSAGE);
-
 		ghostLauncher = new GhostLauncher();
 		ghostLauncher.start();
+
+		caught = false;
 	}
-	
+
 
 	private void checkPacmanCatch(Ghost ghost)
 	{
-		boolean caught = false;
-
 		// Skip check when pacman passing through portal cell
 		if(mapOfRoute[pacman.getYFocus() / 5][pacman.getXFocus() / 5].getType() == 3) return;
 
@@ -835,7 +839,9 @@ public class PacmanGame implements Const {
 		if(ghost.getYFocus() == pacman.getYFocus() && ghost.getXFocus() >= pacman.getXFocus() && ghost.getXFocus() <= pacman.getXCorner() + CELL_SIZE)
 			caught = true;
 		
-		if(caught == true) removePacmanLife(ghost);
+		if(caught == true) {
+			removePacmanLife(ghost);
+		}
 	}
 	
 	
@@ -844,6 +850,9 @@ public class PacmanGame implements Const {
 			//TODO: Think about it
 			pacmanMotionTask.cancel();
 			blinkyMotionTask.cancel();
+			pinkyMotionTask.cancel();
+			inkyMotionTask.cancel();
+			clydeMotionTask.cancel();
 			
 			JOptionPane.showMessageDialog(window, "You won !\nNext level.", "Winner !", JOptionPane.INFORMATION_MESSAGE);
 		}
@@ -884,9 +893,8 @@ public class PacmanGame implements Const {
 		public void run()
 		{
 			preparePictureForCreature(blinky);
-			checkGhostStrategy(blinky);
-			checkPacmanCatch(blinky);
 			updateStrategy(blinky);
+			checkPacmanCatch(blinky);
 		}
 	}
 
@@ -896,9 +904,8 @@ public class PacmanGame implements Const {
 		public void run()
 		{
 			preparePictureForCreature(pinky);
-			checkGhostStrategy(pinky);
-			checkPacmanCatch(pinky);
 			updateStrategy(pinky);
+			checkPacmanCatch(pinky);
 		}
 	}
 
@@ -907,9 +914,8 @@ public class PacmanGame implements Const {
 		public void run()
 		{
 			preparePictureForCreature(inky);
-			checkGhostStrategy(inky);
-			checkPacmanCatch(inky);
 			updateStrategy(inky);
+			checkPacmanCatch(inky);
 		}
 	}
 
@@ -918,9 +924,8 @@ public class PacmanGame implements Const {
 		public void run()
 		{
 			preparePictureForCreature(clyde);
-			checkGhostStrategy(clyde);
-			checkPacmanCatch(clyde);
 			updateStrategy(clyde);
+			checkPacmanCatch(clyde);
 		}
 	}
 	
@@ -942,31 +947,35 @@ public class PacmanGame implements Const {
 	class GhostLauncher extends Thread
 	{
 		private int counter;
-		
+
 		public void run()
 		{
 			while(true)
 			{
-				// Blinky out right now !
-				if(counter == 0) {
+				if(caught) break;
+
+				// Blinky(Red ghost) is coming out first just after the start
+				if(counter == 0)
+				{
 					blinkyTimer = new Timer();
 					blinkyTimer.schedule(blinkyMotionTask = new BlinkyMotion(), 0, SPEED_OF_PACMAN);
 				}
-				
+
 				if(counter == 2) { // Pinky out !
 					pinkyAtHome = false;
 
-					pinkyTimer.cancel();      // Kill previous Timer...
+					pinkyMotionTask.cancel(); // cancel previous HomeMotion task
 					pinkyTimer.purge();
-					pinkyTimer = new Timer(); // Get new instance...
-					pinkyTimer.schedule(pinkyMotionTask = new PinkyMotion(), 0, SPEED_OF_PACMAN); // ... And set new Task (with 3 parameters !)
+
+					pinkyTimer.schedule(pinkyMotionTask = new PinkyMotion(), 0, SPEED_OF_PACMAN); // ... And set new Task (with 3 parameters)
 				}
-				
+
 				if(counter == 7) { // Inky out !
 					inkyAtHome = false;
 
-					inkyTimer.cancel();
+					inkyMotionTask.cancel();
 					inkyTimer.purge();
+
 					inkyTimer = new Timer();
 					inkyTimer.schedule(inkyMotionTask = new InkyMotion(), 0, SPEED_OF_PACMAN);
 				}
@@ -974,11 +983,13 @@ public class PacmanGame implements Const {
 				if(counter == 12) { // Clyde out !
 					clydeAtHome = false;
 
-					clydeTimer.cancel();
+					clydeMotionTask.cancel();
 					clydeTimer.purge();
+
 					clydeTimer = new Timer();
 					clydeTimer.schedule(clydeMotionTask = new ClydeMotion(), 0, SPEED_OF_PACMAN);
-					break;
+
+					break; // Thread stops
 				}
 
 				try {
@@ -987,30 +998,20 @@ public class PacmanGame implements Const {
 				
 				counter++;
 			}
-			
-			// Stop this thread
-			stop();
-		}
+        }
 	}
-	
-	
-	private void checkGhostStrategy(Ghost ghost) {
-		if(ghost.getStrategy().pointsOfTurn.isEmpty() == true) {
+
+	private void updateStrategy(Ghost ghost)
+	{
+		if( ghost.getStrategy().pointsOfTurn.isEmpty() )
+		{
 			ghost.getStrategy().clearVariables();
-			ghost.getStrategy().execution = false;
-		}
-	}
-	
-	
-	private void updateStrategy(Ghost ghost) {
-		if(ghost.getStrategy().execution == false) {
+
 			ghost.getStrategy().launchWave(pacman.getXFocus() / 5, pacman.getYFocus() / 5, ghost.getXFocus() / 5, ghost.getYFocus() / 5);
 			ghost.getStrategy().layPath(ghost.getXFocus() / 5, ghost.getYFocus() / 5);
-			
+
 			ghost.setDirection(ghost.getStrategy().pointsOfTurn.get(new Point(ghost.getXFocus() / 5, ghost.getYFocus() / 5)));
 			ghost.getStrategy().pointsOfTurn.remove(new Point(ghost.getXFocus() / 5, ghost.getYFocus() / 5));
-			
-			ghost.getStrategy().execution = true;
 		}
 	}
 }
