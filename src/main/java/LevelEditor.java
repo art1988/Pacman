@@ -363,6 +363,7 @@ public class LevelEditor implements Const {
 	
 	// TODO: Add pacman pos
 	public void drawLoadedMap() {
+		nameOfMap.setText(level.getMapName());
 		// Set default settings
 		setDefaultColour();
 		initDefaultMapImage();
