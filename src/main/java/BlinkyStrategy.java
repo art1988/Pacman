@@ -1,9 +1,11 @@
 import java.awt.Point;
 
-public class BlinkyStrategy extends Strategy {
+public class BlinkyStrategy extends Strategy
+{
 	// (xGhostCoord, yGhostCoord) - 'start' point
 	// (xPacmanCoord, yPacmanCoord) - 'finish' point
-	void launchWave(int xPacmanCoord, int yPacmanCoord, int xGhostCoord, int yGhostCoord) {	
+	void launchWave(int xPacmanCoord, int yPacmanCoord, int xGhostCoord, int yGhostCoord)
+	{
 		waveMap[yPacmanCoord][xPacmanCoord].setWaveValue(1);
 		
 		getCountOfIteration();
@@ -30,7 +32,8 @@ public class BlinkyStrategy extends Strategy {
 		valueOfWaveFront = waveMap[yGhostCoord][xGhostCoord].getWaveValue();
 	}
 	
-	void layPath(int xGhostCoord, int yGhostCoord) {
+	void layPath(int xGhostCoord, int yGhostCoord)
+	{
 		Direction presentDirection = Direction.NONE,
 		          newDirection     = Direction.NONE;
 		
@@ -61,10 +64,14 @@ public class BlinkyStrategy extends Strategy {
 				pointsOfTurn.put(new Point(x, y), presentDirection);
 				newDirection = presentDirection;
 			}
-			
+
 			if(presentDirection.equals(newDirection) == false) {
 				pointsOfTurn.put(new Point(x, y), presentDirection);
 				newDirection = presentDirection;
+			}
+			else
+			{
+				pointsOfTurn.put(new Point(x, y), presentDirection);
 			}
 		}
 	}

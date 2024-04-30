@@ -2,14 +2,16 @@ import java.awt.Point;
 import java.io.Serializable;
 import java.util.LinkedHashMap;
 
-abstract class Strategy implements Const, Serializable {
-	boolean execution; // Did we reach destination or still in process ?
+abstract class Strategy implements Const, Serializable
+{
+	/** Did we reach destination or still in process ? */
+	boolean execution;
 	
 	int countOfIteration, valueOfWaveFront;
 	
 	CellOfRoute[][] waveMap;
 	
-	LinkedHashMap<Point, Direction> pointsOfTurn = new LinkedHashMap<Point, Direction>(); // Points where ghost will turn
+	LinkedHashMap<Point, Direction> pointsOfTurn = new LinkedHashMap<>(); // Points where ghost will turn
 	
 	abstract void launchWave(int xPacmanCoord, int yPacmanCoord, int xGhostCoord, int yGhostCoord); // From pacman coords to ghost coords
 	
