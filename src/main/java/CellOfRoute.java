@@ -1,7 +1,7 @@
 import java.io.Serializable;
 
 public class CellOfRoute implements Serializable {
-	private static final long serialVersionUID = 2;
+	private static final long serialVersionUID = 200l;
 
 	private boolean availability; // Is this cell available for unit ?
 	private int type;             // 0 - Empty (without food); 1 - Food; 2 - Energizer (Big food); 3 - Portal

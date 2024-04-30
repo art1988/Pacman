@@ -1,7 +1,7 @@
 import java.io.Serializable;
 
 public abstract class Creature implements Serializable {
-	private static final long serialVersionUID = 1;
+	private static final long serialVersionUID = 300l;
 
 	private int xCorner, yCorner; // Left upper corner of image for representation
 	private int xFocus,  yFocus;  // Center of image for moving

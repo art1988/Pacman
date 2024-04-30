@@ -3,7 +3,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 
 public class Level implements Serializable {
-	private static final long serialVersionUID = 3;
+	private static final long serialVersionUID = 400l;
 
 	private int[][]          mapOfWall;
 	private CellOfRoute[][]  mapOfRoute;

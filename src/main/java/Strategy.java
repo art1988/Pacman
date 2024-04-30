@@ -4,7 +4,7 @@ import java.util.LinkedHashMap;
 
 abstract class Strategy implements Const, Serializable
 {
-	private static final long serialVersionUID = 4;
+	private static final long serialVersionUID = 500l;
 
 	/** Did we reach destination or still in process ? */
 	boolean execution;
