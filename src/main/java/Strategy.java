@@ -31,6 +31,10 @@ abstract class Strategy implements Const, Serializable
 		}
 	}
 
+	void cleanPointsOfTurn() {
+		pointsOfTurn.clear();
+	}
+
 	void setWaveMap(CellOfRoute[][] map) {
 		waveMap = map;
 	}
