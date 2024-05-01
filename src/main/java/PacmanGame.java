@@ -1,4 +1,5 @@
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -102,7 +103,7 @@ public class PacmanGame implements Const
 	
 	PacmanGame() {
 		window = new JFrame("Pacman");
-		window.setSize(IMG_W + 90, IMG_H + 25);
+		window.setSize(IMG_W + 100, IMG_H + 35);
 		window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
 		setLocation();
@@ -120,6 +121,7 @@ public class PacmanGame implements Const
 	
 	public JPanel initContent() {
 		JPanel main = new JPanel(new BorderLayout());
+		main.setBorder(new EmptyBorder(5,5,0,0));
 		
 		Box buttons = Box.createVerticalBox();
 		
@@ -377,13 +379,13 @@ public class PacmanGame implements Const
 		pacmanTimer.schedule(pacmanMotionTask = new PacmanMotion(), 0, SPEED_OF_PACMAN);
 
 		pinky.setDirection(Direction.UP); // TODO: Add it in Editor
-		pinkyTimer.schedule(pinkyMotionTask = new HomeMotion(pinky), 0, SPEED_OF_PACMAN);
+		pinkyTimer.schedule(pinkyMotionTask = new HomeMotion(pinky), 100, SPEED_OF_PACMAN);
 		
 		inky.setDirection(Direction.DOWN);
-		inkyTimer.schedule(inkyMotionTask = new HomeMotion(inky), 0, SPEED_OF_PACMAN);
+		inkyTimer.schedule(inkyMotionTask = new HomeMotion(inky), 200, SPEED_OF_PACMAN);
 		
 		clyde.setDirection(Direction.DOWN);
-		clydeTimer.schedule(clydeMotionTask = new HomeMotion(clyde), 0, SPEED_OF_PACMAN);
+		clydeTimer.schedule(clydeMotionTask = new HomeMotion(clyde), 300, SPEED_OF_PACMAN);
 
 		ghostLauncher = new GhostLauncher();
 		ghostLauncher.start();
@@ -413,10 +415,13 @@ public class PacmanGame implements Const
 	public void moveGhostAtHome(Ghost ghost) {
 		moveCreature(ghost);
 		updateCornerCoords(ghost);
-		
-		int x = ghost.getXFocus() / 5 + 1,
-		    y = ghost.getYFocus() / 5;
-		
+
+		int x = ghost.getXFocus() / 5,
+			y = ghost.getYFocus() / 5;
+
+		if(ghost instanceof Inky) x = ghost.getXFocus() / 5 + 1;
+		if(ghost instanceof Clyde) { x = ghost.getXFocus() / 5 - 1;}
+
 		switch(ghost.getDirection()) {
 			case DOWN:
 			case UP:
@@ -737,26 +742,31 @@ public class PacmanGame implements Const
 	
 	// TODO: Complete
 	private void removePacmanLife(Ghost ghost) {
+		if(!ghostLauncher.isInterrupted()) ghostLauncher.interrupt();
+
 		// Kill motion tasks
 		pacmanMotionTask.cancel();
 		pacmanTimer.purge();
+		pacmanTimer.cancel();
 
 		blinkyMotionTask.cancel();
 		blinkyTimer.purge();
+		blinkyTimer.cancel();
 
 		pinkyMotionTask.cancel();
 		pinkyTimer.purge();
+		pinkyTimer.cancel();
 
 		inkyMotionTask.cancel();
 		inkyTimer.purge();
+		inkyTimer.cancel();
 
 		clydeMotionTask.cancel();
 		clydeTimer.purge();
+		clydeTimer.cancel();
 
 		countOfPacmanLife--;
 		lifeIndicator.repaint();
-
-		if(!ghostLauncher.isInterrupted()) ghostLauncher.interrupt();
 
 		String message = "You have been eaten by " + ghost.getName() + " !"+ "\nPrepare for new round !";
 		JOptionPane.showMessageDialog(window, message, "Oops !", JOptionPane.INFORMATION_MESSAGE);
@@ -776,6 +786,9 @@ public class PacmanGame implements Const
 		pacman.setXCorner(pacmanStartCorner.x);
 		pacman.setYCorner(pacmanStartCorner.y);
 		pacman.setDirection(Direction.NONE);
+		pacmanMotion = true;
+		pacmanTimer = new Timer();
+		pacmanTimer.schedule(pacmanMotionTask = new PacmanMotion(), 0, SPEED_OF_PACMAN);
 
 		blinky.setXFocus(blinkyStartFocus.x);
 		blinky.setYFocus(blinkyStartFocus.y);
@@ -783,6 +796,7 @@ public class PacmanGame implements Const
 		blinky.setYCorner(blinkyStartCorner.y);
 		blinky.getStrategy().clearVariables();
 		blinky.setDirection(Direction.NONE);
+		blinky.getStrategy().cleanPointsOfTurn(); // force to clean all previous pointOfTurn if they exists
 		// blinky will start in GhostLauncher just after the start of thread
 
 		pinky.setXFocus(pinkyStartFocus.x);
@@ -792,7 +806,9 @@ public class PacmanGame implements Const
 		pinky.getStrategy().clearVariables();
 		pinkyAtHome = true;
 		pinky.setDirection(Direction.UP);
-		pinkyTimer.schedule(pinkyMotionTask = new HomeMotion(pinky), 0, SPEED_OF_PACMAN);
+		pinky.getStrategy().cleanPointsOfTurn(); // force to clean all previous pointOfTurn if they exists
+		pinkyTimer = new Timer();
+		pinkyTimer.schedule(pinkyMotionTask = new HomeMotion(pinky), 100, SPEED_OF_PACMAN);
 
 		inky.setXFocus(inkyStartFocus.x);
 		inky.setYFocus(inkyStartFocus.y);
@@ -801,7 +817,9 @@ public class PacmanGame implements Const
 		inky.getStrategy().clearVariables();
 		inkyAtHome = true;
 		inky.setDirection(Direction.DOWN);
-		inkyTimer.schedule(inkyMotionTask = new HomeMotion(inky), 0, SPEED_OF_PACMAN);
+		inky.getStrategy().cleanPointsOfTurn(); // force to clean all previous pointOfTurn if they exists
+		inkyTimer = new Timer();
+		inkyTimer.schedule(inkyMotionTask = new HomeMotion(inky), 200, SPEED_OF_PACMAN);
 
 		clyde.setXFocus(clydeStartFocus.x);
 		clyde.setYFocus(clydeStartFocus.y);
@@ -810,14 +828,15 @@ public class PacmanGame implements Const
 		clyde.getStrategy().clearVariables();
 		clydeAtHome = true;
 		clyde.setDirection(Direction.DOWN);
-		clydeTimer.schedule(clydeMotionTask = new HomeMotion(clyde), 0, SPEED_OF_PACMAN);
+		clyde.getStrategy().cleanPointsOfTurn(); // force to clean all previous pointOfTurn if they exists
+		clydeTimer = new Timer();
+		clydeTimer.schedule(clydeMotionTask = new HomeMotion(clyde), 300, SPEED_OF_PACMAN);
 
 		canvasPanel.repaint();
 
+		caught = false;
 		ghostLauncher = new GhostLauncher();
 		ghostLauncher.start();
-
-		caught = false;
 	}
 
 
@@ -839,9 +858,7 @@ public class PacmanGame implements Const
 		if(ghost.getYFocus() == pacman.getYFocus() && ghost.getXFocus() >= pacman.getXFocus() && ghost.getXFocus() <= pacman.getXCorner() + CELL_SIZE)
 			caught = true;
 		
-		if(caught == true) {
-			removePacmanLife(ghost);
-		}
+		if(caught == true) removePacmanLife(ghost);
 	}
 	
 	
@@ -961,7 +978,8 @@ public class PacmanGame implements Const
 					blinkyTimer.schedule(blinkyMotionTask = new BlinkyMotion(), 0, SPEED_OF_PACMAN);
 				}
 
-				if(counter == 2) { // Pinky out !
+				if(counter == 2) // Pinky out !
+				{
 					pinkyAtHome = false;
 
 					pinkyMotionTask.cancel(); // cancel previous HomeMotion task
