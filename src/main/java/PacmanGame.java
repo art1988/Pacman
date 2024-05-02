@@ -216,7 +216,7 @@ public class PacmanGame implements Const
 	
 	class PacmanLifeIndicator extends JComponent {
 		public void paintComponent(Graphics g) {
-			imgLife.setColor(window.getBackground());
+			imgLife.setColor(new Color(213, 213, 213));
 			imgLife.fillRect(0, 0, IND_W, IND_H);
 			
 			fillOutLifeIndicator();
@@ -401,7 +401,7 @@ public class PacmanGame implements Const
 		
 		if(creature instanceof Pacman) {
 			checkAccessOfNextDirection();
-			pacmanEatingAnimation();
+			pacmanEating();
 		}
 		
 		checkNextStep(creature);
@@ -419,7 +419,7 @@ public class PacmanGame implements Const
 		int x = ghost.getXFocus() / 5,
 			y = ghost.getYFocus() / 5;
 
-		if(ghost instanceof Inky) x = ghost.getXFocus() / 5 + 1;
+		if(ghost instanceof Inky) { x = ghost.getXFocus() / 5 + 4;}
 		if(ghost instanceof Clyde) { x = ghost.getXFocus() / 5 - 1;}
 
 		switch(ghost.getDirection()) {
@@ -461,7 +461,7 @@ public class PacmanGame implements Const
 			if(mouthOn == true) {
 				imgPicture.drawImage(pacmanMouthOn, pacman.getXCorner() * 2 + CELL_SIZE, pacman.getYCorner() * 2 + CELL_SIZE, null);
 				mouthOn = false;
-				return;
+                return;
 			}
 			
 			if(mouthOn == false) {
@@ -564,7 +564,7 @@ public class PacmanGame implements Const
 				imgPacMouthOff.fillArc(0, 0, 2 * CELL_SIZE, 2 * CELL_SIZE, 270, 360);
 			break;
 		}
-	}
+    }
 	
 	
 	public void checkNextStep(Creature creature) {
@@ -666,7 +666,7 @@ public class PacmanGame implements Const
 	}
 	
 	
-	public void pacmanEatingAnimation() {
+	public void pacmanEating() {
 		int x = pacman.getXFocus() / 5,
 	    	y = pacman.getYFocus() / 5;
 		
@@ -741,9 +741,8 @@ public class PacmanGame implements Const
 	}
 	
 	// TODO: Complete
-	private void removePacmanLife(Ghost ghost) {
-		if(!ghostLauncher.isInterrupted()) ghostLauncher.interrupt();
-
+	private void removePacmanLife(Ghost ghost)
+	{
 		// Kill motion tasks
 		pacmanMotionTask.cancel();
 		pacmanTimer.purge();
@@ -911,7 +910,7 @@ public class PacmanGame implements Const
 		{
 			preparePictureForCreature(blinky);
 			updateStrategy(blinky);
-			checkPacmanCatch(blinky);
+			if(caught == false) checkPacmanCatch(blinky);
 		}
 	}
 
@@ -922,7 +921,7 @@ public class PacmanGame implements Const
 		{
 			preparePictureForCreature(pinky);
 			updateStrategy(pinky);
-			checkPacmanCatch(pinky);
+			if(caught == false) checkPacmanCatch(pinky);
 		}
 	}
 
@@ -932,7 +931,7 @@ public class PacmanGame implements Const
 		{
 			preparePictureForCreature(inky);
 			updateStrategy(inky);
-			checkPacmanCatch(inky);
+			if(caught == false) checkPacmanCatch(inky);
 		}
 	}
 
@@ -942,7 +941,7 @@ public class PacmanGame implements Const
 		{
 			preparePictureForCreature(clyde);
 			updateStrategy(clyde);
-			checkPacmanCatch(clyde);
+			if(caught == false) checkPacmanCatch(clyde);
 		}
 	}
 	
