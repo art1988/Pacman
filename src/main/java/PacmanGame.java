@@ -984,7 +984,7 @@ public class PacmanGame implements Const
 					pinkyMotionTask.cancel(); // cancel previous HomeMotion task
 					pinkyTimer.purge();
 
-					pinkyTimer.schedule(pinkyMotionTask = new PinkyMotion(), 0, SPEED_OF_PACMAN); // ... And set new Task (with 3 parameters)
+					pinkyTimer.schedule(pinkyMotionTask = new PinkyMotion(), 100, SPEED_OF_PACMAN); // ... And set new Task (with 3 parameters)
 				}
 
 				if(counter == 7) { // Inky out !
@@ -993,7 +993,7 @@ public class PacmanGame implements Const
 					inkyMotionTask.cancel();
 					inkyTimer.purge();
 
-					inkyTimer.schedule(inkyMotionTask = new InkyMotion(), 0, SPEED_OF_PACMAN);
+					inkyTimer.schedule(inkyMotionTask = new InkyMotion(), 200, SPEED_OF_PACMAN);
 				}
 				
 				if(counter == 12) { // Clyde out !
@@ -1002,7 +1002,7 @@ public class PacmanGame implements Const
 					clydeMotionTask.cancel();
 					clydeTimer.purge();
 
-					clydeTimer.schedule(clydeMotionTask = new ClydeMotion(), 0, SPEED_OF_PACMAN);
+					clydeTimer.schedule(clydeMotionTask = new ClydeMotion(), 300, SPEED_OF_PACMAN);
 
 					break; // Thread stops
 				}
