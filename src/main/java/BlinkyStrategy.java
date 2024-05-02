@@ -1,5 +1,9 @@
 import java.awt.Point;
 
+/**
+ * The most 'aggressive' moving strategy for red ghost.
+ * Simply sets (x,y) to the last position of pacman and moves ghost there.
+ */
 public class BlinkyStrategy extends Strategy
 {
 	// (xGhostCoord, yGhostCoord) - 'start' point
@@ -74,16 +78,5 @@ public class BlinkyStrategy extends Strategy
 				pointsOfTurn.put(new Point(x, y), presentDirection);
 			}
 		}
-	}
-	
-	private void getCountOfIteration() {
-		for(int y = 1; y < MAP_H - 1; y++) 
-			for(int x = 1; x < MAP_W - 1; x++) 
-				if(waveMap[y][x].getAccess() == true) countOfIteration++;
-	}
-	
-	private void increaseWaveValue(int y, int x) {
-		if(waveMap[y][x].getAccess() == true && waveMap[y][x].isVisited() == false) 
-			waveMap[y][x].setWaveValue(valueOfWaveFront + 1);
 	}
 }

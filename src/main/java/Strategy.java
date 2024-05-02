@@ -38,4 +38,15 @@ abstract class Strategy implements Const, Serializable
 	void setWaveMap(CellOfRoute[][] map) {
 		waveMap = map;
 	}
+
+	protected void getCountOfIteration() {
+		for(int y = 1; y < MAP_H - 1; y++)
+			for(int x = 1; x < MAP_W - 1; x++)
+				if(waveMap[y][x].getAccess() == true) countOfIteration++;
+	}
+
+	protected void increaseWaveValue(int y, int x) {
+		if(waveMap[y][x].getAccess() == true && waveMap[y][x].isVisited() == false)
+			waveMap[y][x].setWaveValue(valueOfWaveFront + 1);
+	}
 }

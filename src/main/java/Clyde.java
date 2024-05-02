@@ -5,7 +5,7 @@ public class Clyde extends Ghost {
 		super(xFocus, yFocus);
 
 		setImage(new SerializableImage(Toolkit.getDefaultToolkit().getImage(System.getProperty("user.dir") + "/src/main/resources/orangeGhost.png")));
-		setStrategy(new BlinkyStrategy());
+		setStrategy(new ClydeStrategy());
 		setName("Clyde");
 	}
 }
