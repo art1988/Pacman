@@ -67,7 +67,7 @@ public class PacmanGame implements Const
 							 inkyMotionTask,
 							 clydeMotionTask;
 
-	private static boolean caught = false; // Was Pacman caught ?
+	private static volatile boolean caught = false; // Was Pacman caught ?
 
 	private static GhostLauncher ghostLauncher;
 	
@@ -129,24 +129,27 @@ public class PacmanGame implements Const
 		start.setFocusable(false);
 		start.addActionListener(new ButtonListener());
 		buttons.add(start);
+		buttons.add(Box.createRigidArea(new Dimension(5, 5)));
 		
 		editor = new JButton("Level editor");
 		editor.setFocusable(false);
 		editor.addActionListener(new ButtonListener());
 		buttons.add(editor);
+		buttons.add(Box.createRigidArea(new Dimension(5, 5)));
 		
 		load = new JButton("Load level");
 		load.setFocusable(false);
 		load.addActionListener(new ButtonListener());
 		buttons.add(load);
-		
+		buttons.add(Box.createRigidArea(new Dimension(5, 5)));
+
 		exit = new JButton("Exit");
 		
 		exit.setFocusable(false);
 		exit.addActionListener(new ButtonListener());
 		buttons.add(exit);
 		
-		buttons.add(Box.createVerticalStrut(165));
+		buttons.add(Box.createVerticalStrut(150));
 		lifeIndicator.setBorder(BorderFactory.createTitledBorder(""));
 		buttons.add(lifeIndicator);
 
@@ -408,40 +411,30 @@ public class PacmanGame implements Const
 		
 		canvasPanel.repaint();
 	}
-	
-	
-	
-	// TODO: Complete method
-	public void moveGhostAtHome(Ghost ghost) {
-		moveCreature(ghost);
-		updateCornerCoords(ghost);
 
-		int x = ghost.getXFocus() / 5,
-			y = ghost.getYFocus() / 5;
+	public void moveGhostAtHome(Ghost ghost)
+	{
+		preparePictureForCreature(ghost);
 
-		if(ghost instanceof Inky) { x = ghost.getXFocus() / 5 + 4;}
-		if(ghost instanceof Clyde) { x = ghost.getXFocus() / 5 - 1;}
+		int x = ghost.getXFocus() / 5 + 1,
+			y = ghost.getYFocus() / 5 + 1;
 
-		switch(ghost.getDirection()) {
-			case DOWN:
-			case UP:
-				y += 1;
-				break;
-		}
-		
-		if(mapOfWall[y][x] == 4) { // Downside wall
-			ghost.setDirection(Direction.UP);   
+		// Change direction in case if ghost meets lower wall
+		if(mapOfWall[y][x] == 4)
+		{
+			ghost.setDirection(Direction.UP);
 			return;
 		}
-		
-		//TODO: Think about it
-		if(mapOfWall[y][x] == 2 || mapOfWall[y][x] == 10) { // Upside wall or flap
+
+		// Change direction in case if ghost meets top  wall or flap
+		if(mapOfWall[y][x] == 2 || mapOfWall[y][x] == 10)
+		{
 			ghost.setDirection(Direction.DOWN);
 			return; 
 		}
 	}
-	
-	
+
+
 	// Move creature's focus
 	public void moveCreature(Creature creature) {
 		switch(creature.getDirection()) {
@@ -470,51 +463,58 @@ public class PacmanGame implements Const
 				return;
 			}
 		}
-		
-		if(creature instanceof Ghost) {
-			if(creature instanceof Blinky) {
-				imgPicture.drawImage( ((Ghost)(creature)).getImage().getImage(),
-						                       creature.getXCorner() * 2 + CELL_SIZE,
-						   					   creature.getYCorner() * 2 + CELL_SIZE, 
-						   					   2 * CELL_SIZE, 
-						   					   2 * CELL_SIZE, 
-						   					   null);
-			}
+
+		if(creature instanceof Blinky) {
+			imgPicture.drawImage( ((Ghost)(creature)).getImage().getImage(),
+					                       creature.getXCorner() * 2 + CELL_SIZE,
+					   					   creature.getYCorner() * 2 + CELL_SIZE,
+					   					   2 * CELL_SIZE,
+					   					   2 * CELL_SIZE,
+					   					   null);
+		}
 			
-			if(creature instanceof Pinky) {
-				if(pinkyAtHome) {
-					imgPicture.drawImage( ((Ghost)(creature)).getImage().getImage(),
-												   creature.getXCorner() * 2 + CELL_SIZE + 5,
-            				                       creature.getYCorner() * 2 + CELL_SIZE, 2 * CELL_SIZE, 2 * CELL_SIZE, null);
-				} else {
-					imgPicture.drawImage( ((Ghost)(creature)).getImage().getImage(),
-		                   				           creature.getXCorner() * 2 + CELL_SIZE,
-		                   				           creature.getYCorner() * 2 + CELL_SIZE, 2 * CELL_SIZE, 2 * CELL_SIZE, null);
-				}
+		if(creature instanceof Pinky) {
+			if(pinkyAtHome) {
+				imgPicture.drawImage( ((Ghost)(creature)).getImage().getImage(),
+											   creature.getXCorner() * 2 + CELL_SIZE + 3,
+           				                       creature.getYCorner() * 2 + CELL_SIZE,
+											   2 * CELL_SIZE,
+											   2 * CELL_SIZE,
+											   null);
+			} else {
+				imgPicture.drawImage( ((Ghost)(creature)).getImage().getImage(),
+		                  				           creature.getXCorner() * 2 + CELL_SIZE,
+		                  				           creature.getYCorner() * 2 + CELL_SIZE, 2 * CELL_SIZE, 2 * CELL_SIZE, null);
 			}
+		}
 
-			if(creature instanceof Inky) {
-				if(inkyAtHome) {
-					imgPicture.drawImage( ((Ghost)(creature)).getImage().getImage(),
-							creature.getXCorner() * 2 + CELL_SIZE + 5,
-							creature.getYCorner() * 2 + CELL_SIZE, 2 * CELL_SIZE, 2 * CELL_SIZE, null);
-				} else {
-					imgPicture.drawImage( ((Ghost)(creature)).getImage().getImage(),
-							creature.getXCorner() * 2 + CELL_SIZE,
-							creature.getYCorner() * 2 + CELL_SIZE, 2 * CELL_SIZE, 2 * CELL_SIZE, null);
-				}
+		if(creature instanceof Inky) {
+			if(inkyAtHome) {
+				imgPicture.drawImage( ((Ghost)(creature)).getImage().getImage(),
+						creature.getXCorner() * 2 + CELL_SIZE + 3,
+						creature.getYCorner() * 2 + CELL_SIZE,
+						2 * CELL_SIZE,
+						2 * CELL_SIZE,
+						null);
+			} else {
+				imgPicture.drawImage( ((Ghost)(creature)).getImage().getImage(),
+						creature.getXCorner() * 2 + CELL_SIZE,
+						creature.getYCorner() * 2 + CELL_SIZE, 2 * CELL_SIZE, 2 * CELL_SIZE, null);
 			}
+		}
 
-			if(creature instanceof Clyde) {
-				if(clydeAtHome) {
-					imgPicture.drawImage( ((Ghost)(creature)).getImage().getImage(),
-							creature.getXCorner() * 2 + CELL_SIZE + 5,
-							creature.getYCorner() * 2 + CELL_SIZE, 2 * CELL_SIZE, 2 * CELL_SIZE, null);
-				} else {
-					imgPicture.drawImage( ((Ghost)(creature)).getImage().getImage(),
-							creature.getXCorner() * 2 + CELL_SIZE,
-							creature.getYCorner() * 2 + CELL_SIZE, 2 * CELL_SIZE, 2 * CELL_SIZE, null);
-				}
+		if(creature instanceof Clyde) {
+			if(clydeAtHome) {
+				imgPicture.drawImage( ((Ghost)(creature)).getImage().getImage(),
+						creature.getXCorner() * 2 + CELL_SIZE + 3,
+						creature.getYCorner() * 2 + CELL_SIZE,
+						2 * CELL_SIZE,
+						2 * CELL_SIZE,
+						null);
+			} else {
+				imgPicture.drawImage( ((Ghost)(creature)).getImage().getImage(),
+						creature.getXCorner() * 2 + CELL_SIZE,
+						creature.getYCorner() * 2 + CELL_SIZE, 2 * CELL_SIZE, 2 * CELL_SIZE, null);
 			}
 		}
 	}
