@@ -100,18 +100,18 @@ public class LevelEditor implements Const {
 		
 		///*****************Buttons*****************
 		JPanel buttons = new JPanel();
-		
-		close = new JButton("Close");
-		close.addActionListener(new ButtonListener());
-		buttons.add(close);
-		
-		save = new JButton("Save map");
-		save.addActionListener(new ButtonListener());
-		buttons.add(save);
-		
+
 		load = new JButton("Load map");
 		load.addActionListener(new ButtonListener());
 		buttons.add(load);
+
+		save = new JButton("Save map");
+		save.addActionListener(new ButtonListener());
+		buttons.add(save);
+
+		close = new JButton("Close");
+		close.addActionListener(new ButtonListener());
+		buttons.add(close);
 		///******************************************
 		
 		// All JRadioButtons are here
